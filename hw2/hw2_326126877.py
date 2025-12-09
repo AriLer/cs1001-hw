@@ -278,4 +278,3 @@ def test():
         print("Error Q4b2 - 1")
 
 
-test()

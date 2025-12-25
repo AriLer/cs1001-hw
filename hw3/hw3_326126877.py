@@ -219,7 +219,6 @@ def PageRank_search(G, t, p, text, pages_desc, pages_promote):
         else:
             curr = random.choices(range(len(G)), weights=relevancies)[0]
 
-    # נרמול הביקורים
     total_visits = sum(counter)
     return [v / total_visits for v in counter]
 
@@ -300,6 +299,3 @@ def test():
 
 
 test()
-
-
-# השאלה הבאה נתנה לי בעבודה. תממש את הפונקציה הנדרשת בסעיף ב' תוך כדי שימוש בפונקציה

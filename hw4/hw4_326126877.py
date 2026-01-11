@@ -66,43 +66,47 @@ def quick_comparison_ordered_input(n, t):
 
     return (random_time / t, deterministic_time / t)
 
+
 ##############
 # Question 2 #
 ##############
 
+
 # TODO: Question 2 - a (drawing the binary recursion tree)
 # 2b
-def init_max_v1_improved(L):
-    def max_v1_improved(start, end):
+def max_v1_improved(L):
+    def step(start, end):
         if start == end:
             return L[start]
 
         mid = (start + end) // 2
-        first_half = max_v1_improved(start, mid)
-        second_half = max_v1_improved(mid + 1, end)
+        first_half = step(start, mid)
+        second_half = step(mid + 1, end)
 
         return max(first_half, second_half)
 
-    return max_v1_improved(0, len(L) - 1)
+    return step(0, len(L) - 1)
 
 
-def init_max_v2_improved(L):
+def max_v2_improved(L):
 
-    def max_v2_improved(start):
+    def step(start):
         if start == len(L) - 1:
             return L[start]
-       
-        without_left = max_v2_improved(start + 1) 
+
+        without_left = step(start + 1)
         return max(without_left, L[start])
 
-    return max_v2_improved(0)
+    return step(0)
+
 
 # 2c
 def reverse(L):
     reversed = []
-    for i in range(len(L) - 1, -1 ,-1):
+    for i in range(len(L) - 1, -1, -1):
         reversed.append(L[i])
     return reversed
+
 
 ##############
 # Question 3 #
@@ -121,37 +125,59 @@ def cnt_paths(L):
             L[i] += 1
     return result
 
+
 def cnt_paths_mem(L, memo={}):
-    if tuple(L) in memo:
-        return memo[tuple(L)]
-    
-    if all([elem == 0 for elem in L]):
+
+    state = tuple(L)
+
+    if state in memo:
+        return memo[state]
+
+    if all(elem == 0 for elem in L):
         return 1
-    
+
     result = 0
     for i in range(len(L)):
         if L[i] != 0:
             L[i] -= 1
-            memo[tuple(L)] = cnt_paths_mem(L, memo)
+            result += cnt_paths_mem(L, memo)
             L[i] += 1
+
+    memo[state] = result
     return result
 
-def test_cnt_paths():
-    # Base Case: Already at the origin
-    assert cnt_paths_mem([0, 0]) == 1
-    
-    # Single Dimension: Only 1 path possible (straight line)
-    print("cnt_paths_mem([5]): ", cnt_paths_mem([5]))
-    assert cnt_paths_mem([5]) == 1
 
-    # 2D Grid (2x2): Should be 6 paths (4 choose 2)
-    # Paths: (1,1,0,0) permutations: RRYY, RYRY, RYYR, YRYR, YRRY, YYRR
-    assert cnt_paths_mem([2, 2]) == 6
-test_cnt_paths()
+import timeit
 
 
 def cnt_paths_iter(L):
-    pass  # replace this with your code
+    d = len(L)
+    # dctionary there each entry is a tuple of the coordinates and the number of paths to reach it
+    path_counts = {tuple([0] * d): 1}
+
+    curr_loc = [0] * d
+
+    while True:
+
+        if any(x > 0 for x in curr_loc):
+            total = 0
+            for i in range(d):
+                if curr_loc[i] > 0:
+                    curr_loc[i] -= 1
+                    total += path_counts[tuple(curr_loc)]
+                    curr_loc[i] += 1
+            path_counts[tuple(curr_loc)] = total
+
+        for i in range(d - 1, -1, -1):
+            if curr_loc[i] < L[i]:
+                curr_loc[i] += 1
+                for j in range(i + 1, d):
+                    curr_loc[j] = 0
+                break
+        else:
+            break
+
+    return path_counts[tuple(L)]
 
 
 ##############
@@ -159,7 +185,10 @@ def cnt_paths_iter(L):
 ##############
 # 4a
 def legal_path(A, vertices):
-    pass  # replace this with your code
+    for i in range(len(vertices) - 1):
+        if A[vertices[i]][vertices[i + 1]] == 0:
+            return False
+    return True
 
 
 # 4c
@@ -167,7 +196,8 @@ def path_v2(A, s, t, k):
     if k == 0:
         return s == t
 
-    # ADD YOUR CODE HERE #
+    if k == 1:
+        return A[s][t] == 1
 
     for i in range(len(A)):
         mid = k // 2
@@ -199,20 +229,30 @@ def path_rec(A, s, t, L):
 
 ##############
 
+
 # 5a
-
-
 def can_create_once(s, lst):
+    def solve(cur_sum, idx):
+        if idx == len(lst):
+            return cur_sum == s
 
-    pass  # replace this with your code
+        add = solve(cur_sum + lst[idx], idx + 1)
+        sub = solve(cur_sum - lst[idx], idx + 1)
+        return add or sub
+
+    return solve(0, 0)
 
 
 # 5b
 
 
 def can_create_twice(s, lst):
+    if not lst:
+        return s == 0
 
-    pass  # replace this with your code
+    val, *rest = lst
+
+    return any(can_create_twice(s - k * val, rest) for k in [0, 1, -1, 2, -2])
 
 
 # 5c
@@ -287,3 +327,6 @@ def test():
         or valid_brackets_placement(5, lst.copy())
     ):
         print("error in valid_brackets_placement")
+
+
+test()

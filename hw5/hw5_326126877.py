@@ -403,35 +403,43 @@ def lowest_common_ancestor(t, n1, n2):
         return left_lca if left_lca is not None else right_lca
     return lca_helper(t.root, n1, n2)
 
-tree = BinarySearchTree()
-def build_sample_tree():
-    global tree
-    keys = [8, 4, 12, 2, 6, 10, 14, 1, 3, 5, 7, 9, 11, 13, 15]
-    for key in keys:
-        tree.insert(key, key * 10)
-    return tree
-build_sample_tree();
-print(tree)
-n1 = 4
-n2 = 8
-# print(f"lowest common ancestor of {n1} and {n2} is", lowest_common_ancestor(tree, n1, n2).key)
-
-
 def build_balanced(n):
     tree = BinarySearchTree()
-    def bb_helper(curr_n):
-        if curr_n == n:
-            return tree
-        pass
-
-    return bb_helper(1)
-
-test_tree = build_balanced(4)
-print(test_tree)
-
+    def bb_helper(sub_tree):
+        if len(sub_tree) == 0:
+            return
+        if len(sub_tree) == 1:
+            tree.insert(sub_tree[0], sub_tree[0])
+        else:
+            mid = len(sub_tree) // 2
+            tree.insert(sub_tree[mid], sub_tree[mid])
+            bb_helper(sub_tree[:mid])
+            bb_helper(sub_tree[mid + 1:])
+    bb_helper([i+1 for i in range(2**n - 1)])
+    return tree
 
 def subtree_sum(t, k):
-    pass  # replace this with your code
+    def sum(node):
+        if node is None:
+            return 0
+        return node.key + sum(node.left) + sum(node.right)
+
+    def helper(node, k, curr_depth=1):
+        if node is None:
+            return 0
+        if node.key == k:
+            return sum(node)
+        elif node.key < k:
+            return helper(node.right, k)
+        else:
+            return helper(node.left, k)
+    
+    return helper(t.root, k)
+
+tree = build_balanced(4)
+print(tree)
+print("tree.size: ", tree.size)
+print(subtree_sum(tree, 6))
 
 ##############
 # QUESTION 4 #

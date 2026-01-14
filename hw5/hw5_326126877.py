@@ -383,7 +383,6 @@ def gen7():
 # QUESTION 3 #
 ##############
 
-# TODO: analyze time complexity of lowest_common_ancestor
 def lowest_common_ancestor(t, n1, n2):
     def lca_helper(node, n1, n2):
         if node is None:
@@ -405,17 +404,17 @@ def lowest_common_ancestor(t, n1, n2):
 
 def build_balanced(n):
     tree = BinarySearchTree()
-    def bb_helper(sub_tree):
-        if len(sub_tree) == 0:
+    def bb_helper(start, end):
+        if start == end:
             return
-        if len(sub_tree) == 1:
-            tree.insert(sub_tree[0], sub_tree[0])
+        if end - start == 1:
+            tree.insert(start, start)
         else:
-            mid = len(sub_tree) // 2
-            tree.insert(sub_tree[mid], sub_tree[mid])
-            bb_helper(sub_tree[:mid])
-            bb_helper(sub_tree[mid + 1:])
-    bb_helper([i+1 for i in range(2**n - 1)])
+            mid = (start + end) // 2
+            tree.insert(mid, mid)
+            bb_helper(start, mid)
+            bb_helper(mid + 1, end)
+    bb_helper(1, 2**n)
     return tree
 
 def subtree_sum(t, k):
@@ -437,16 +436,27 @@ def subtree_sum(t, k):
     return helper(t.root, k)
 
 tree = build_balanced(4)
-print(tree)
-print("tree.size: ", tree.size)
-print(subtree_sum(tree, 6))
+# print(tree)
+# print("tree.size: ", tree.size)
+# print(subtree_sum(tree, 6))
 
 ##############
 # QUESTION 4 #
 ##############
 def prefix_suffix_overlap(lst, k):
-    pass  # replace this with your code
+    overlap_list = []
+    for i in range(len(lst)):
+        pref = lst[i][:k]
+        for j in range(len(lst)):
+            if i != j:
+                suff = lst[j][-k:]
+                if pref == suff:
+                    overlap_list.append((i, j))
+    return overlap_list
 
+s0 = ["abcd", "cdab", "aaaa", "bbbb", "abff"]
+k0 = 2
+# print(prefix_suffix_overlap(s0, k0))
 
 class Dict:
     def __init__(self, m, hash_func=hash):
@@ -466,16 +476,47 @@ class Dict:
         self.table[i].append(item)
 
     def find(self, key):
-        """ returns ALL values of key as a list, empty list if none """
-        pass  # replace this with your code
-
+        bucket = self.table[self.hash_mod(key)]
+        items = []
+        for item in bucket:
+            if item[0] == key:
+                items.append(item[1])
+        return items
 
 def prefix_suffix_overlap_hash1(lst, k):
-    pass  # replace this with your code
+    d = Dict(len(lst))
+    for i in range(len(lst)):
+        d.insert(lst[i][:k], i)
+    
+    overlap_list = []
+    for i in range(len(lst)):
+        suff_indexes = d.find(lst[i][-k:])
+        for j in suff_indexes:
+            if i != j:
+                overlap_list.append((i, j)) 
+    return overlap_list
 
 def almost_prefix_suffix_overlap_hash1(lst, k):
-    pass  # replace this with your code
+    d = Dict(len(lst))
+    for i in range(len(lst)):
+        for j in range(1, k+1):
+            d.insert(lst[i][:k][:j], i)
+    print("d: ", d)
+    
+    overlap_list = []
+    for i in range(len(lst)):
+        print("lst[i]: ", lst[i][-k:])
+        for j in range(k):
+            suff_indexes = d.find(lst[i][-k:][-j:])
+            for j in suff_indexes:
+                if i != j and (i, j) not in overlap_list:
+                    overlap_list.append((i, j)) 
+    return overlap_list
 
+s0 = ["abcd", "cdab", "aaaa", "bbbb", "abff"]
+k0 = 2
+print(almost_prefix_suffix_overlap_hash1(s0, k0))
+print(prefix_suffix_overlap_hash1(s0, k0))
 
 ##############
 # QUESTION 5 #

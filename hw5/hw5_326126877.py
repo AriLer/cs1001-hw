@@ -435,11 +435,6 @@ def subtree_sum(t, k):
     
     return helper(t.root, k)
 
-tree = build_balanced(4)
-# print(tree)
-# print("tree.size: ", tree.size)
-# print(subtree_sum(tree, 6))
-
 ##############
 # QUESTION 4 #
 ##############
@@ -453,11 +448,6 @@ def prefix_suffix_overlap(lst, k):
                 if pref == suff:
                     overlap_list.append((i, j))
     return overlap_list
-
-s0 = ["abcd", "cdab", "aaaa", "bbbb", "abff"]
-k0 = 2
-# print(prefix_suffix_overlap(s0, k0))
-
 class Dict:
     def __init__(self, m, hash_func=hash):
         """ initial hash table, m empty entries """
@@ -493,7 +483,7 @@ def prefix_suffix_overlap_hash1(lst, k):
         suff_indexes = d.find(lst[i][-k:])
         for j in suff_indexes:
             if i != j:
-                overlap_list.append((i, j)) 
+                overlap_list.append((j, i)) 
     return overlap_list
 
 def almost_prefix_suffix_overlap_hash1(lst, k):
@@ -501,22 +491,15 @@ def almost_prefix_suffix_overlap_hash1(lst, k):
     for i in range(len(lst)):
         for j in range(1, k+1):
             d.insert(lst[i][:k][:j], i)
-    print("d: ", d)
-    
+
     overlap_list = []
     for i in range(len(lst)):
-        print("lst[i]: ", lst[i][-k:])
         for j in range(k):
             suff_indexes = d.find(lst[i][-k:][-j:])
             for j in suff_indexes:
                 if i != j and (i, j) not in overlap_list:
-                    overlap_list.append((i, j)) 
+                    overlap_list.append((j, i)) 
     return overlap_list
-
-s0 = ["abcd", "cdab", "aaaa", "bbbb", "abff"]
-k0 = 2
-print(almost_prefix_suffix_overlap_hash1(s0, k0))
-print(prefix_suffix_overlap_hash1(s0, k0))
 
 ##############
 # QUESTION 5 #
@@ -554,22 +537,24 @@ class Rational1:
             return False
     
     def __add__(self, other):
-        # Add your code here #
-        pass
+        n = self.n * other.d + other.n * self.d
+        d = self.d * other.d
+        return Rational1(n, d)
 
     def __mul__(self, other):
-        # Add your code here #
-        pass    
+        n = self.n * other.n
+        d = self.d * other.d
+        return Rational1(n, d)
 
     def divides(self, other):
-        # Add your code here #
-        pass
+        return (other.n * self.d) % (self.n * other.d) == 0
 
     def __lt__(self, other):
-        # Add your code here #
-        pass
- 
+        n = self.n * other.d
+        d = other.n * self.d
+        return n < d
 
+ 
 class Rational2:
     """ represent a rational number using quotient, remainder and denominator """
 
@@ -605,22 +590,22 @@ class Rational2:
             return False
         
     def __add__(self, other):
-        # Add your code here #
-        pass
+        n = (self.q * self.d + self.r) + (other.q * other.d + other.r)
+        d = self.d * other.d
+        return Rational2(n, d)
 
     def __mul__(self, other):
-        # Add your code here #
-        pass
+        n = (self.q * self.d + self.r) * (other.q * other.d + other.r)
+        d = self.d * other.d
+        return Rational2(n, d)
 
     def divides(self, other):
-        # Add your code here #
-        pass
+        return ((other.q * other.d + other.r) * self.d) % ((self.q * self.d + self.r) * other.d) == 0
 
     def __lt__(self, other):
-        # Add your code here #
-        pass
-
-
+        n = (self.q * self.d + self.r) * other.d
+        d = (other.q * other.d + other.r) * self.d
+        return n < d
 class Point:
     def __init__(self,x,y):
         self.x = x
@@ -633,8 +618,7 @@ class Point:
         return self.x == other.x and self.y == other.y
     
     def __lt__(self, other):
-        pass
-
+        return (self.x < other.x) or (self.x == other.x and self.y < other.y)
 
 ##############
 # TESTS      #
@@ -677,4 +661,4 @@ def test():
         print("5 - error in prefix_suffix_overlap_hash1")
 
 
-# test()
+test()
